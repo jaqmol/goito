@@ -1,0 +1,2 @@
+# goito
+Go Iterator Library
