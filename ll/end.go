@@ -1,6 +1,8 @@
 package ll
 
-import "sync"
+import (
+	"sync"
+)
 
 func End[I any](runFn func(I, chan<- error)) StartInputter[I] {
 	return &end[I]{

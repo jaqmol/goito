@@ -42,7 +42,7 @@ func (g *gen[I, O]) start(wg *sync.WaitGroup, errCh chan<- error) {
 	go func() {
 		defer wg.Done()
 		g.runFn(g.startV, g.nextSi.input(), errCh)
-		close(g.nextSi.input())
+		// close(g.nextSi.input())
 	}()
 	g.nextSi.start(wg, errCh)
 }

@@ -1,6 +1,8 @@
 package ll
 
-import "sync"
+import (
+	"sync"
+)
 
 func New[I, O any](runFn func(I, chan<- O, chan<- error)) Piper[I, O] {
 	return &pipe[I, O]{
@@ -22,7 +24,7 @@ func (p *pipe[I, O]) start(wg *sync.WaitGroup, errCh chan<- error) {
 		for in := range p.inputCh {
 			p.runFn(in, p.nextSi.input(), errCh)
 		}
-		close(p.nextSi.input())
+		// close(p.nextSi.input())
 	}()
 	p.nextSi.start(wg, errCh)
 }
