@@ -11,11 +11,12 @@ type Ender[I any] interface {
 }
 
 type end[I any] struct {
-	wg    *sync.WaitGroup
-	runFn EndRunFn[I]
-	input chan I
-	error chan error
-	mErrs MultiError
+	wg     *sync.WaitGroup
+	runFn  EndRunFn[I]
+	input  chan I
+	error  chan error
+	mErrs  MultiError
+	isDone bool
 }
 
 func End[I any](runFn EndRunFn[I]) Ender[I] {
@@ -61,7 +62,10 @@ func (e *end[I]) Error(err error) {
 }
 
 func (e *end[I]) Done() {
-	close(e.input)
+	if !e.isDone {
+		close(e.input)
+		e.isDone = true
+	}
 }
 
 func (e *end[I]) Wait() error {

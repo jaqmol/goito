@@ -1,6 +1,8 @@
 package ll
 
-import "sync"
+import (
+	"sync"
+)
 
 type Piper[I, O any] interface {
 	Sink[I]
@@ -8,11 +10,12 @@ type Piper[I, O any] interface {
 }
 
 type pipe[I, O any] struct {
-	wg    *sync.WaitGroup
-	next  Sink[O]
-	runFn PipeRunFn[I, O]
-	input chan I
-	error chan error
+	wg     *sync.WaitGroup
+	sink   Sink[O]
+	runFn  PipeRunFn[I, O]
+	input  chan I
+	error  chan error
+	isDone bool
 }
 
 func Pipe[I, O any](runFn PipeRunFn[I, O]) Piper[I, O] {
@@ -27,15 +30,15 @@ func Pipe[I, O any](runFn PipeRunFn[I, O]) Piper[I, O] {
 			select {
 			case item, ok := <-p.input:
 				if ok {
-					p.runFn(item, p.next)
+					p.runFn(item, p.sink)
 				} else {
 					inputIsOpen = false
 				}
 			case err := <-p.error:
-				p.next.Error(err)
+				p.sink.Error(err)
 			}
 		}
-		p.next.Done()
+		p.sink.Done()
 		p.wg.Done()
 	}()
 	return p
@@ -45,10 +48,10 @@ func (p *pipe[I, O]) waitGroup(wg *sync.WaitGroup) {
 	if p.wg == nil {
 		p.wg = wg
 		p.wg.Add(1)
-		if p.next == nil {
+		if p.sink == nil {
 			panic("Nexts must all be set before calling Start()")
 		}
-		p.next.waitGroup(wg)
+		p.sink.waitGroup(wg)
 	} else {
 		panic("Wait group already set")
 	}
@@ -63,9 +66,12 @@ func (p *pipe[I, O]) Error(err error) {
 }
 
 func (p *pipe[I, O]) Done() {
-	close(p.input)
+	if !p.isDone {
+		close(p.input)
+		p.isDone = true
+	}
 }
 
 func (p *pipe[I, O]) Next(sink Sink[O]) {
-	p.next = sink
+	p.sink = newSinkWrapper[O](p.Done, sink)
 }

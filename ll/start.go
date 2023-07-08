@@ -1,6 +1,8 @@
 package ll
 
-import "sync"
+import (
+	"sync"
+)
 
 type Starter[I, O any] interface {
 	Piper[I, O]
