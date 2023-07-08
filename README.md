@@ -19,4 +19,4 @@ This package only defines the iterator interface, plus a sorting function for sa
 
 ## Package ll
 
-This package implements a pipelining library in which every step is executed in a different goroutine, while actual execution is sequential. See test for example.
+This package implements a streaming library in which every node is executed in a different goroutine, while actual execution is sequential, communication is implemented on top of go channels. See test for example.
