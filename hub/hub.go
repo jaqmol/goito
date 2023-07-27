@@ -33,7 +33,7 @@ func On[T any](h *Hub, name string, handlerFn func(T)) {
 	h.handlers = append(h.handlers, thisHandler.(handler[any]))
 }
 
-func Send[T any](h *Hub, name string, msg any) {
+func Send[T any](h *Hub, name string, msg T) {
 	for _, c := range h.pipes {
 		c.send(name, msg)
 	}

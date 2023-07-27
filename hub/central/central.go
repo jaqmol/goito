@@ -10,7 +10,7 @@ func On[T any](name string, handlerFn func(T)) {
 	hub.On[T](h, name, handlerFn)
 }
 
-func Send[T any](name string, msg any) {
+func Send[T any](name string, msg T) {
 	hub.Send[T](h, name, msg)
 }
 
