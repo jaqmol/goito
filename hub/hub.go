@@ -5,7 +5,7 @@ type Hub struct {
 	handlers []handler[any]
 }
 
-func On[T any](h Hub, name string, handlerFn func(T)) {
+func On[T any](h *Hub, name string, handlerFn func(T)) {
 	var thisPipe pipe[T]
 	for _, c := range h.pipes {
 		if c.is(name) {
@@ -33,13 +33,13 @@ func On[T any](h Hub, name string, handlerFn func(T)) {
 	h.handlers = append(h.handlers, thisHandler.(handler[any]))
 }
 
-func Send[T any](h Hub, name string, msg any) {
+func Send[T any](h *Hub, name string, msg any) {
 	for _, c := range h.pipes {
 		c.send(name, msg)
 	}
 }
 
-func Cascade(h Hub, names ...string) {
+func Cascade(h *Hub, names ...string) {
 	pipes := make([]pipe[any], len(names))
 	for i, n := range names {
 		for _, p := range h.pipes {
@@ -56,7 +56,7 @@ func Cascade(h Hub, names ...string) {
 	}
 }
 
-func Close(h Hub, name string) {
+func Close(h *Hub, name string) {
 	delIdx := -1
 	for i, c := range h.pipes {
 		if c.close(name) {
