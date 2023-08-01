@@ -28,7 +28,7 @@ func (l *lineReader) Next() bool {
 }
 
 func (l *lineReader) Item() string {
-	return l.scanner.Text()
+	return l.line
 }
 
 func (l *lineReader) Close() error {
