@@ -9,6 +9,10 @@ type Piper[I, O any] interface {
 	Next(Sink[O])
 }
 
+type Nexter[O any] interface {
+	Next(Sink[O])
+}
+
 type pipe[I, O any] struct {
 	wg     *sync.WaitGroup
 	sink   Sink[O]
@@ -21,8 +25,8 @@ type pipe[I, O any] struct {
 func Pipe[I, O any](runFn PipeRunFn[I, O]) Piper[I, O] {
 	p := &pipe[I, O]{
 		runFn: runFn,
-		input: make(chan I),
-		error: make(chan error),
+		input: make(chan I, 1),
+		error: make(chan error, 1),
 	}
 	go func() {
 		inputIsOpen := true

@@ -22,8 +22,8 @@ type end[I any] struct {
 func End[I any](runFn EndRunFn[I]) Ender[I] {
 	e := &end[I]{
 		runFn: runFn,
-		input: make(chan I),
-		error: make(chan error),
+		input: make(chan I, 1),
+		error: make(chan error, 1),
 	}
 	go func() {
 		inputIsOpen := true
